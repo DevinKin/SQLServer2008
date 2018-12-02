@@ -242,3 +242,25 @@ SELECT P.ProductNumber, SO.Description
 
 
 -- test1
+SELECT P.LastName AS Name
+	FROM Person.Person P
+	JOIN HumanResources.Employee E
+		ON P.BusinessEntityID = E.BusinessEntityID
+	WHERE E.NationalIDNumber = '112457891';
+
+-- test2
+SELECT P.ProductID, P.Name
+	FROM Production.Product P
+	LEFT JOIN Sales.SpecialOfferProduct SSP
+		ON P.ProductID = SSP.ProductID
+	WHERE SSP.SpecialOfferID IS NULL
+	UNION
+SELECT P.ProductID, P.Name
+	FROM Production.Product P
+	JOIN Sales.SpecialOfferProduct SSP
+		ON P.ProductID = SSP.ProductID
+	JOIN Sales.SpecialOffer SSO
+		ON SSO.SpecialOfferID = SSP.SpecialOfferID
+	WHERE SSO.Description = 'No Discount';
+
+SELECT * FROM Sales.SpecialOfferProduct

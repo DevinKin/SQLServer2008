@@ -245,3 +245,5 @@ SELECT v.VendorName, a.Address
   		ON SSO.SpecialOfferID = SSP.SpecialOfferID
   	WHERE SSO.Description = 'No Discount';
   ```
+
+
