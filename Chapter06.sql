@@ -169,3 +169,63 @@ EXEC sp_helpconstraint Customers;
 
 INSERT INTO Customers(CustomerName, Address1, Address2, City, State, Zip, Contact, Phone, FedIDNo, DateInSystem)
 	VALUES('MyCust', '123 Anywhere', '', 'Reno', 'NV', 80808, 'Joe Bob', '(800) 555-1212', '931234567', GETDATE());
+
+
+-- 临时禁用已存在的约束
+EXEC sp_helpconstraint Customers;
+
+ALTER TABLE Customers
+	NOCHECK
+	CONSTRAINT CN_CustomerPhoneNo;
+
+ALTER TABLE Customers
+	NOCHECK
+	CONSTRAINT CN_CustomerDateInSystem;
+
+ALTER TABLE Customers
+	CHECK
+	CONSTRAINT CN_CustomerDateInSystem;
+
+ALTER TABLE Customers
+	CHECK
+	CONSTRAINT CN_CustomerPhoneNo;
+
+CREATE RULE SalaryRule
+	AS @Salary > 0;
+
+EXEC sp_helptext SalaryRule;
+
+EXEC sp_bindrule 'SalaryRule', 'Employees.Salary';
+
+EXEC sp_unbindrule 'Employees.Salary';
+
+DROP RULE SalaryRule;
+
+CREATE DEFAULT SalaryDefault
+	AS 0;
+
+EXEC sp_bindefault 'SalaryDefault', 'Employees.Salary';
+
+EXEC sp_unbindefault'SalaryDefault', 'Employees.Salary';
+
+
+-- 练习题1
+ALTER TABLE Customers
+	ADD CONSTRAINT AK_CustomerFedIDNo
+	UNIQUE (FedIDNo);
+
+EXEC sp_helpconstraint Customers;
+
+EXEC sp_help Customers;
+
+
+-- 练习题2
+ALTER TABLE Employees
+	WITH NOCHECK
+	ADD CONSTRAINT CK_EidAndMidNotEqual
+	CHECK
+		(EmployeeID <> ManagerEmpID);
+
+EXEC sp_helpconstraint Employees;
+
+SELECT * FROM Employees;

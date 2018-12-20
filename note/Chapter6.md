@@ -267,3 +267,118 @@
 
 ### 临时禁用已存在的约束
 
+- 目的：为了原来的数据
+
+  ```mssql
+  ALTER TABLE Customers
+  	NOCHECK
+  	CONSTRAINT CN_CustomerPhoneNo;
+  
+  ALTER TABLE Customers
+  	CHECK
+  	CONSTRAINT CN_CustomerPhoneNo;
+  ```
+
+## 规则和默认值
+
+- 规则和默认值与约束是不同的两个概念
+  - 约束是表的功能，本身没有存在形式。
+  - 约束是在表定义中定义的。
+  - 规则和默认值是自身的实际对象，本身存在。
+  - 规则和默认值是单独定义的，然后“绑定”到表上。
+
+### 规则
+
+- 规则和CHECK约束非常类似，唯一区别是
+  - 规则每次之作用于一个列。
+  - 可以将同一个规则分别绑定到一个表中的多个列，但是规则分别作用于每个列。
+
+- 定义一个规则
+
+  ```mssql
+  CREATE RULE SalaryRule
+  	AS @Salary > 0;
+  ```
+
+- 查看规则
+
+  ```mssql
+  EXEC sp_helptext SalaryRule;
+  ```
+
+- 激活规则语法
+
+  ```mssql
+  sp_bindrule <''rule''>,<''object_name''>, [<''futureonly_flag''>]
+  ```
+
+- 激活规则
+
+  ```mssql
+  EXEC sp_bindrule 'SalaryRule', 'Employees.Salary';
+  ```
+
+- 解绑规则
+
+  ```mssql
+  EXEC sp_unbindrule 'SalaryRule', 'Employees.Salary';
+  ```
+
+- 删除规则，需要先解绑规则
+
+  ```mssql
+  DROP RULE SalaryRule;
+  ```
+
+### 默认值
+
+- 默认值和DEFAULT约束类似，但是它们被追加到表中的方式和用户自定义数据类型的默认值的支持不同。
+
+- 定义默认值的语法
+
+  ```mssql
+  CREATE DEFAULT <default name>
+  AS <default valuee>
+  ```
+
+- 定义默认值
+
+  ```mssql
+  CREATE DEFAULT SalaryDefault
+  	AS 0;
+  ```
+
+- 默认值绑定到对象
+
+  ```mssql
+  EXEC sp_bindefault 'SalaryDefault', 'Employees.Salary';
+  ```
+
+- 从表中解除默认值的绑定
+
+  ```mssql
+  EXEC sp_unbindefault'SalaryDefault', 'Employees.Salary';
+  ```
+
+- 删除默认值语法
+
+  ```
+  DROP DEFAULT <default name>
+  ```
+
+### 确定哪些表和数据类型使用给定的规则和默认值
+
+- 语法
+
+  ```mssql
+  EXEC sp_depends <object name>
+  ```
+
+### 数据完整性决策矩阵
+
+|     限制     |                             优点                             |                           缺点                           |
+| :----------: | :----------------------------------------------------------: | :------------------------------------------------------: |
+|     约束     |     快速，可以引用其他列，在命令执行前发生，遵循ANSI标准     | 必须对每个表重新定义，不能引用其他表，不能绑定到数据类型 |
+| 规则、默认值 |   独立的对象，可重用，可以绑定到数据类型，在命令执行前发生   | 稍慢，不能跨列引用，不能引用其他表，实际上只用于向后兼容 |
+|    触发器    | 非常灵活，可以引用其他列或者其他标，可以通过.NET引用SQL Server外部的其他信息 |            在命令执行之后发生，系统开销很大。            |
+
