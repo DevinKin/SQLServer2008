@@ -515,6 +515,9 @@ WITH BigSpenders AS
 ), TotalOrders AS (
 	SELECT soh.CustomerID, soh.SalesOrderID, soh.OrderDate, soh.TotalDue, ROW_NUMBER() OVER (PARTITION BY soh.CustomerID ORDER BY soh.OrderDate DESC) OrderRow
 	FROM Sales.SalesOrderHeader soh 
-	JOIN BigSpenders bs ON soh.CustomerID = bs.CustomerID
-	WHERE OrderRow <= 5
+	JOIN BigSpenders bs ON soh.CustomerID = bs.CustomerID 
 )
+SELECT CustomerID, SalesOrderID, OrderDate, TotalDue
+FROM TotalOrders
+WHERE OrderRow <= 5
+ORDER BY CustomerID, OrderRow;
