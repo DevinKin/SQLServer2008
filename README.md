@@ -6,4 +6,5 @@
 - [第5章-创建和修改数据表](./note/Chapter5.md)
 - [第6章-键和约束](./note/Chapter6.md)
 - [第7章-更复杂的查询](./note/Chapter7.md)
+- [第8章-规范化和其他基本设计问题](./note/Chapter8.md)
 
